@@ -1,0 +1,86 @@
+<!DOCTYPE web-app PUBLIC
+  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+  "http://java.sun.com/dtd/web-app_2_3.dtd" >
+
+<web-app>
+  <display-name>CS410J Examples Web Application</display-name>
+  <context-param>
+    <!-- Register REST services bound into these modules with resteasy -->
+    <param-name>resteasy.guice.modules</param-name>
+    <param-value>edu.pdx.cs410J.di.RestModule</param-value>
+  </context-param>
+  <filter>
+    <!-- Filter all requests through the Guice -->
+    <filter-name>guiceFilter</filter-name>
+    <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>guiceFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <listener>
+    <listener-class>
+      org.jboss.resteasy.plugins.guice.GuiceResteasyBootstrapServletContextListener
+    </listener-class>
+  </listener>
+  <servlet>
+    <servlet-name>ServletInfo</servlet-name>
+    <display-name>Servlet Info</display-name>
+    <description>Summarizes information about a servlet request</description>
+    <servlet-class>edu.pdx.cs410J.servlets.ServletInfoServlet</servlet-class>
+    <init-param>
+      <param-name>param1</param-name>
+      <param-value>Hello Param</param-value>
+      <description>Example servlet parameter</description>
+    </init-param>
+  </servlet>
+  <servlet>
+    <servlet-name>MovieDatabase</servlet-name>
+    <servlet-class>edu.pdx.cs410J.servlets.MovieDatabaseServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>FamilyTree</servlet-name>
+    <servlet-class>edu.pdx.cs410J.servlets.FamilyTreeServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>LastVisitServlet</servlet-name>
+    <servlet-class>edu.pdx.cs410J.servlets.LastVisitServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>Session</servlet-name>
+    <servlet-class>edu.pdx.cs410J.servlets.SessionServlet</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>FileUpload</servlet-name>
+    <servlet-class>edu.pdx.cs410J.servlets.FileUploadServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ServletInfo</servlet-name>
+    <url-pattern>/info</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MovieDatabase</servlet-name>
+    <url-pattern>/movies</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MovieDatabase</servlet-name>
+    <url-pattern>/movies/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FamilyTree</servlet-name>
+    <url-pattern>/family/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LastVisitServlet</servlet-name>
+    <url-pattern>/visit</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Session</servlet-name>
+    <url-pattern>/session</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>FileUpload</servlet-name>
+    <url-pattern>/upload</url-pattern>
+  </servlet-mapping>
+
+</web-app>

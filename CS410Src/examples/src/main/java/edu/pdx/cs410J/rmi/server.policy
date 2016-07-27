@@ -1,0 +1,6 @@
+// Policy file for running RMI servers
+
+grant {
+  permission java.net.SocketPermission "*:80-65535",
+      "connect,accept,resolve";
+}; 
