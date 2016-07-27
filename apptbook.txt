@@ -1,0 +1,17 @@
+paul thompson's appointment book!
+
+Description: a cool appointment
+Duration: 60 minutes.
+Begin Time: 3/2/16 3:00 PM
+End Time: 3/2/16 4:00 PM
+
+Description: a cool appointment
+Duration: 60 minutes.
+Begin Time: 3/2/16 3:00 PM
+End Time: 3/2/16 4:00 PM
+
+Description: another cool appointment
+Duration: 60 minutes.
+Begin Time: 3/2/16 5:00 PM
+End Time: 3/2/16 6:00 PM
+

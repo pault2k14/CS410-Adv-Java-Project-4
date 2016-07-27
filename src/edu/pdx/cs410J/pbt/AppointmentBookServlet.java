@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -34,13 +36,19 @@ public class AppointmentBookServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
+        PrettyPrinter pretty = new PrettyPrinter("apptbook.txt");
         PrintWriter pw = response.getWriter();
         String queryString = request.getQueryString();
         boolean viewAllAppointmentsUrlMatch = queryString.matches("^owner=(\\w|[+])+$");
         boolean searchAppointmentsUrlMatch = queryString.matches("^owner=(\\w|[+])+&beginTime=(\\w|[+])&endTime=(\\w|[+])");
 
         if(viewAllAppointmentsUrlMatch) {
-            pw.println("Made it to View All Appointments URL!");
+
+            pretty.dump(appointmentBook);
+            byte[] appointments = Files.readAllBytes(Paths.get("apptbook.txt"));
+            String apptBook = new String(appointments);
+
+            pw.println(apptBook);
             pw.flush();
 
             response.setStatus(HttpServletResponse.SC_OK);
