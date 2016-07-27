@@ -21,6 +21,16 @@ public class Messages
         return String.format("The required parameter \"%s\" is missing", parameterName);
     }
 
+    public static String addedAppointment( String owner)
+    {
+        return String.format( "Added appointment for %s to appointment book.", owner);
+    }
+
+    public static String badPostUrl()
+    {
+        return String.format( "The POST request used an invalid URL query pattern.");
+    }
+
     public static String mappedKeyValue( String key, String value )
     {
         return String.format( "Mapped %s to %s", key, value );

@@ -5,7 +5,9 @@ import edu.pdx.cs410J.web.HttpRequestHelper;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.net.URLConnection;
 
 /**
  * A helper class for accessing the rest client
@@ -47,6 +49,8 @@ public class AppointmentBookRestClient extends HttpRequestHelper
     public Response addAppointment( String newOwner, String newDescription, String newBeginTime, String newEndTime) throws IOException
     {
 
+
+
         String[] params = new String[8];
         params[0] = "owner";
         params[1] = newOwner;
@@ -57,8 +61,11 @@ public class AppointmentBookRestClient extends HttpRequestHelper
         params[6] = "endTime";
         params[7] = newEndTime;
 
-        this.url = "http://localhost:8080/apptbook/appointments?owner=name";
-        return postToMyURL(params);
+        this.url += "?owner=" + URLEncoder.encode(newOwner, "UTF-8");
+        return postToMyURL("key", "owner", "value", newOwner,
+                "key", "description", "value", newDescription,
+                "key", "beginTime", "value", newBeginTime,
+                "key", "endTime", "value", newEndTime);
     }
 
     public Response addKeyValuePair( String key, String value ) throws IOException

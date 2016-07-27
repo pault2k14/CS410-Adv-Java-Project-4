@@ -169,7 +169,7 @@ public class Project4 {
             System.exit(0);
         }
 
-        if(searchPresent) {
+        if(!searchPresent) {
             newOwner = args[firstAppointmentArg + 0];
             newDescription = args[firstAppointmentArg + 1];
             stringBeginDate = args[firstAppointmentArg + 2] + " " + args[firstAppointmentArg + 3] + " " + args[firstAppointmentArg + 4];
@@ -294,11 +294,18 @@ public class Project4 {
             return;
         }
 
-        if(printAppointment) {
-            // System.out.println(appointment.toString());
+        if(printAppointment && response.getCode() == 200) {
+            String appointment = "Added appointment for " + newOwner + "\n" +
+                    "Description: " + newDescription + "\n" +
+                    "Starts at: " + stringBeginDate + "\n" +
+                    "Ends at: " + stringEndDate + "\n";
+
+            System.out.println(appointment);
         }
 
-        System.out.println(response.getContent());
+        else {
+            System.out.println(response.getContent());
+        }
 
         System.exit(0);
     }

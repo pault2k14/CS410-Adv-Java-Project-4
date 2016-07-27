@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +21,7 @@ import java.util.Map;
 public class AppointmentBookServlet extends HttpServlet
 {
     private final Map<String, String> data = new HashMap<>();
+    private AppointmentBook appointmentBook = null;
 
     /**
      * Handles an HTTP GET request from a client by writing the value of the key
@@ -31,13 +34,34 @@ public class AppointmentBookServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
-        String key = getParameter( "key", request );
-        if (key != null) {
-            writeValue(key, response);
+        PrintWriter pw = response.getWriter();
+        String queryString = request.getQueryString();
+        boolean viewAllAppointmentsUrlMatch = queryString.matches("^owner=(\\w|[+])+$");
+        boolean searchAppointmentsUrlMatch = queryString.matches("^owner=(\\w|[+])+&beginTime=(\\w|[+])&endTime=(\\w|[+])");
 
-        } else {
-            writeAllMappings(response);
+        if(viewAllAppointmentsUrlMatch) {
+            pw.println("Made it to View All Appointments URL!");
+            pw.flush();
+
+            response.setStatus(HttpServletResponse.SC_OK);
         }
+        else if(searchAppointmentsUrlMatch) {
+            pw.println("Made it to Search All Appointments URL!");
+            pw.flush();
+
+            response.setStatus(HttpServletResponse.SC_OK);
+        }
+        else {
+            pw.println("Bad GET URL!");
+            pw.flush();
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
+
+
+
+
     }
 
     /**
@@ -50,25 +74,87 @@ public class AppointmentBookServlet extends HttpServlet
     {
         response.setContentType( "text/plain" );
 
-        String key = getParameter( "key", request );
-        if (key == null) {
-            missingRequiredParameter(response, "key");
-            return;
-        }
-
-        String value = getParameter( "value", request );
-        if ( value == null) {
-            missingRequiredParameter( response, "value" );
-            return;
-        }
-
-        this.data.put(key, value);
-
         PrintWriter pw = response.getWriter();
-        pw.println(Messages.mappedKeyValue(key, value));
-        pw.flush();
+        String queryString = request.getQueryString();
+        boolean addAppointmentUrlMatch = queryString.matches("^owner=(\\w|[+])+$");
 
-        response.setStatus( HttpServletResponse.SC_OK);
+        if(addAppointmentUrlMatch) {
+            String[] keyParamValues = request.getParameterValues("key");
+            String[] valueParamValues = request.getParameterValues("value");
+            HashMap<String, String> paramMap = new HashMap<>();
+            Appointment appointment = null;
+            String owner = null;
+            String description = null;
+            String beginTime = null;
+            String endTime = null;
+
+            if(keyParamValues == null) {
+                missingRequiredParameter(response, "No key parameters found!");
+                return;
+            }
+
+            if(valueParamValues == null) {
+                missingRequiredParameter(response, "No values for key parameters found!");
+                return;
+            }
+
+            if (keyParamValues.length == valueParamValues.length) {
+
+                for (int i = 0; i < keyParamValues.length; ++i) {
+                    paramMap.put(keyParamValues[i], valueParamValues[i]);
+                }
+            } else {
+                missingRequiredParameter(response, "Query parameter mismatch!");
+                return;
+            }
+
+            owner = paramMap.get("owner");
+            description = paramMap.get("description");
+            beginTime = paramMap.get("beginTime");
+            endTime = paramMap.get("endTime");
+
+            if (owner == null || owner.length() == 0) {
+                missingRequiredParameter(response, "owner");
+                return;
+            }
+
+            if (description == null || description.length() == 0) {
+                missingRequiredParameter(response, "description");
+                return;
+            }
+
+            if (beginTime == null) {
+                missingRequiredParameter(response, "beginTime");
+                return;
+            }
+
+            if (endTime == null) {
+                missingRequiredParameter(response, "endTime");
+                return;
+            }
+
+            if (appointmentBook == null) {
+                appointmentBook = new AppointmentBook(owner);
+            }
+
+            appointment = new Appointment(description, beginTime, endTime);
+
+            appointmentBook.addAppointment(appointment);
+
+            pw.println(Messages.addedAppointment(owner));
+            pw.flush();
+
+            response.setStatus(HttpServletResponse.SC_OK);
+
+        }
+
+        else {
+            pw.println(Messages.badPostUrl());
+            pw.flush();
+
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+
     }
 
     /**

@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Built-From-Revision: ${scmRevision}
+Implementation-Title: Appointment Book Web/REST Project
+Implementation-Version: 1.0-SNAPSHOT
+Built-By: Paul
+Built-From-Branch: ${scmBranch}
+Implementation-Vendor-Id: edu.pdx.cs410J.pbt
+Created-By: IntelliJ IDEA
+Build-Jdk: 1.8.0_40
+Built-On: ${buildTimestamp}
+
