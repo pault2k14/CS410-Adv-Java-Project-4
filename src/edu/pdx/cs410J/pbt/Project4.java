@@ -291,25 +291,17 @@ public class Project4 {
                 return;
             }
         }
-        if(printAppointment && hostPresent && portPresent && !searchPresent && response.getCode() == 200 ) {
-            String appt = "Added appointment for " + newOwner + "\n" +
-                    "Description: " + newDescription + "\n" +
-                    "Starts at: " + stringBeginDate + "\n" +
-                    "Ends at: " + stringEndDate + "\n";
-
-            System.out.println(appt);
+        if(hostPresent && portPresent && response.getCode() == 200 ) {
+            System.out.println(response.getContent());
         }
         else if(printAppointment && !hostPresent && !portPresent && !searchPresent && appointmentBook != null && appointment != null) {
             System.out.println("Appointment for: " + appointmentBook.getOwnerName() + "\n" +
                     "Description: " + appointment.getDescription() + "\n" +
-                    "Starts at: " + appointment.getBeginTimeString() + "\n" +
-                    "Ends at: " + appointment.getEndTimeString() + "\n"
+                    "Begin time: " + appointment.getBeginTimeString() + "\n" +
+                    "End time: " + appointment.getEndTimeString() + "\n"
             );
         }
 
-        else {
-            System.out.println(response.getContent());
-        }
 
         System.exit(0);
     }

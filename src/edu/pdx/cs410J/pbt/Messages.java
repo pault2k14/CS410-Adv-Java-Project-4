@@ -18,17 +18,6 @@ public class Messages
     }
 
     /**
-     * Provides a success message when an appointment has been added.
-     * @param owner - The owner of the appontment that was added.
-     * @return - Returns a string with a success message for adding an
-     *           appointment.
-     */
-    public static String addedAppointment( String owner)
-    {
-        return String.format( "Added appointment for %s to appointment book.", owner);
-    }
-
-    /**
      * Creates a failure message for a bad POST URL.
      * @return - Returns a string with a failure message for a bad POST URL.
      */

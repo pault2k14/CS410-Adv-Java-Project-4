@@ -111,6 +111,7 @@ public class AppointmentBookServlet extends HttpServlet
             return;
         }
 
+        /*
         // If the user came to the search appointments URL
         // fulfill their request.
         if(searchAppointmentsUrlMatch) {
@@ -176,6 +177,7 @@ public class AppointmentBookServlet extends HttpServlet
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
+        */
 
         // Somehow we made it all of the way here, so
         // our resource was not found, let the user know.
@@ -184,6 +186,131 @@ public class AppointmentBookServlet extends HttpServlet
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
     }
+
+    protected void doSearchAllAppointments(HttpServletRequest request, HttpServletResponse response )
+    {
+        response.setContentType( "text/plain" );
+
+        AppointmentBook currentAppointmentBook = null;
+        String owner = request.getParameter("owner");
+        String beginTime = null;
+        String endTime = null;
+        Date beginDate = null;
+        Date endDate = null;
+        StringBuffer requestURI = request.getRequestURL();
+        String queryString = request.getQueryString();
+        String fullUrl = requestURI + "?" + queryString;
+        String decodedUrl = URLDecoder.decode(fullUrl);
+        String decodedQueryString = decodedUrl.substring(decodedUrl.lastIndexOf("?") + 1);
+        PrettyPrinter pretty = new PrettyPrinter("apptbook.txt");
+        PrintWriter pw = response.getWriter();
+
+        // Setup Regexes so we can parse the GET request.
+        String dateFilter = "\\d\\d?/\\d\\d?/\\d\\d\\d\\d";
+        String timeFilter = "\\d\\d?:\\d\\d";
+        String amPmFilter = "(am|pm)";
+        String entireDateFilter = dateFilter + " " + timeFilter + " " + amPmFilter;
+        boolean viewAllAppointmentsUrlMatch = decodedQueryString.matches("^owner=(\\w|[+])+$");
+        boolean searchAppointmentsUrlMatch = decodedQueryString.matches("^owner=(\\w|[+])+&beginTime=" + entireDateFilter + "&endTime=" + entireDateFilter);
+
+        // Make sure owner is specified in the parameters.
+        if(owner == null) {
+            pw.println("The owner parameter must be specified.");
+            pw.flush();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        // Let's try to find an appointment book that
+        for(AppointmentBook apptBook : appointmentBooks) {
+
+            if(apptBook.getOwnerName().equals(owner)) {
+                currentAppointmentBook = apptBook;
+            }
+        }
+
+        // No appointment book was found, nothing we can do
+        // in a GET request.
+        if(currentAppointmentBook == null) {
+            pw.println("No appointment book found for " + owner);
+            pw.flush();
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        // If the user came to the search appointments URL
+        // fulfill their request.
+
+    // Before we search for appoinments we need
+    // to convert our date strings to dates.
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
+        dateFormat.setLenient(false);
+
+        beginTime = request.getParameter("beginTime");
+        endTime = request.getParameter("endTime");
+
+            // Attempt to parse the begin date and time to ensure that they
+            // are valid dates and times.
+            try {
+                beginDate = dateFormat.parse(beginTime);
+            }
+            catch (ParseException e) {
+                pw.println("Begin date and time format is incorrect.");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+
+            // Attempt to parse the begin date and time to ensure that they
+            // are valid dates and times.
+            try {
+                endDate = dateFormat.parse(endTime);
+            }
+            catch (ParseException e) {
+                pw.println("End date and time format is incorrect.");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+
+            // Make a temporary appointment book so we can
+            // dump it using pretty printer.
+            Collection<Appointment> appointments = currentAppointmentBook.getAppointments();
+            AppointmentBook tempBook = new AppointmentBook(owner);
+
+            for(Appointment appt: appointments) {
+
+                if(appt.getBeginTime().compareTo(beginDate) == 1 || appt.getBeginTime().compareTo(beginDate) == 0 ) {
+
+                    if(appt.getEndTime().compareTo(endDate) == -1 || appt.getEndTime().compareTo(endDate) == 0) {
+                        tempBook.addAppointment(appt);
+                    }
+                }
+            }
+
+            pretty.dump(tempBook);
+            byte[] appts = Files.readAllBytes(Paths.get("apptbook.txt"));
+            String apptBook = new String(appts);
+
+            if (tempBook.getAppointments().size() > 0){
+                pw.println("The following appointments were found: ");
+                pw.println(apptBook);
+            }
+            else {
+                pw.println("No appointments found.");
+            }
+
+            pw.flush();
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+
+
+        // Somehow we made it all of the way here, so
+        // our resource was not found, let the user know.
+        pw.println("Unable to find resource.");
+        pw.flush();
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+    }
+
 
     /**
      * Handles an HTTP POST request by storing the appointment to the correct
@@ -286,7 +413,12 @@ public class AppointmentBookServlet extends HttpServlet
 
             currentAppointmentBook.addAppointment(appointment);
 
-            pw.println(Messages.addedAppointment(owner));
+            pw.println("Appointment for: " + currentAppointmentBook.getOwnerName() + "\n" +
+                       "Description: " + appointment.getDescription() + "\n" +
+                       "Begin time: " + appointment.getBeginTimeString() + "\n" +
+                       "End time: " + appointment.getEndTimeString() + "\n"
+            );
+
             pw.flush();
 
             response.setStatus(HttpServletResponse.SC_OK);
