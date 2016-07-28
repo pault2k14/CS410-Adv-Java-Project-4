@@ -22,10 +22,13 @@ public class Project4 {
 
         Class c = AbstractAppointmentBook.class;  // Refer to one of Dave's classes so that we can be sure it is on the classpath
 
-        String appointmentBookFileName = null;
+        AppointmentBook appointmentBook = null;
+        Appointment appointment = null;
         boolean searchPresent = false;
         String hostName = null;
         int port = 0;
+        boolean portPresent = false;
+        boolean hostPresent = false;
         String key = null;
         String value = null;
         Date beginDate = null;
@@ -90,6 +93,7 @@ public class Project4 {
             if(args[i].equals("-host")) {
                 expectedArgs += 2;
                 firstAppointmentArg += 2;
+                hostPresent = true;
 
                 if(i + 1 < args.length) {
                     hostName = args[i + 1];
@@ -107,6 +111,7 @@ public class Project4 {
             if(args[i].equals("-port")) {
                 expectedArgs += 2;
                 firstAppointmentArg += 2;
+                portPresent = true;
 
                 if(i + 1 < args.length) {
 
@@ -260,32 +265,46 @@ public class Project4 {
             System.exit(0);
         }
 
+        if(!hostPresent && !portPresent && !searchPresent) {
+            appointmentBook = new AppointmentBook(newOwner);
+            appointment = new Appointment(newDescription, stringBeginDate, stringEndDate);
+            appointmentBook.addAppointment(appointment);
+        }
+
         AppointmentBookRestClient client = new AppointmentBookRestClient(hostName, port);
 
         HttpRequestHelper.Response response = null;
-        try {
 
-            if(searchPresent) {
-                response = client.searchAppointments(newOwner, stringBeginDate, stringEndDate);
+        if(hostPresent && portPresent) {
+            try {
+
+                if (searchPresent) {
+                    response = client.searchAppointments(newOwner, stringBeginDate, stringEndDate);
+                } else {
+                    response = client.addAppointment(newOwner, newDescription, stringBeginDate, stringEndDate);
+                }
+
+                checkResponseCode(HttpURLConnection.HTTP_OK, response);
+
+            } catch (IOException ex) {
+                error("While contacting server: " + ex);
+                return;
             }
-            else {
-                response = client.addAppointment(newOwner, newDescription, stringBeginDate, stringEndDate);
-            }
-
-            checkResponseCode( HttpURLConnection.HTTP_OK, response);
-
-        } catch ( IOException ex ) {
-            error("While contacting server: " + ex);
-            return;
         }
-
-        if(printAppointment && response.getCode() == 200) {
-            String appointment = "Added appointment for " + newOwner + "\n" +
+        if(printAppointment && hostPresent && portPresent && !searchPresent && response.getCode() == 200 ) {
+            String appt = "Added appointment for " + newOwner + "\n" +
                     "Description: " + newDescription + "\n" +
                     "Starts at: " + stringBeginDate + "\n" +
                     "Ends at: " + stringEndDate + "\n";
 
-            System.out.println(appointment);
+            System.out.println(appt);
+        }
+        else if(printAppointment && !hostPresent && !portPresent && !searchPresent && appointmentBook != null && appointment != null) {
+            System.out.println("Appointment for: " + appointmentBook.getOwnerName() + "\n" +
+                    "Description: " + appointment.getDescription() + "\n" +
+                    "Starts at: " + appointment.getBeginTimeString() + "\n" +
+                    "Ends at: " + appointment.getEndTimeString() + "\n"
+            );
         }
 
         else {
