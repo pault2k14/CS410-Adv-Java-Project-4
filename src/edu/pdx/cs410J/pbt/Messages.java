@@ -6,37 +6,36 @@ package edu.pdx.cs410J.pbt;
  */
 public class Messages
 {
-    public static String getMappingCount( int count )
-    {
-        return String.format( "Server contains %d key/value pairs", count );
-    }
 
-    public static String formatKeyValuePair( String key, String value )
-    {
-        return String.format("  %s -> %s", key, value);
-    }
-
+    /**
+     * Sends a message for missing parameters.
+     * @param parameterName - The specified parameter that is missing.
+     * @return - A string stating the missing parameter.
+     */
     public static String missingRequiredParameter( String parameterName )
     {
         return String.format("The required parameter \"%s\" is missing", parameterName);
     }
 
+    /**
+     * Provides a success message when an appointment has been added.
+     * @param owner - The owner of the appontment that was added.
+     * @return - Returns a string with a success message for adding an
+     *           appointment.
+     */
     public static String addedAppointment( String owner)
     {
         return String.format( "Added appointment for %s to appointment book.", owner);
     }
 
+    /**
+     * Creates a failure message for a bad POST URL.
+     * @return - Returns a string with a failure message for a bad POST URL.
+     */
     public static String badPostUrl()
     {
         return String.format( "The POST request used an invalid URL query pattern.");
     }
 
-    public static String mappedKeyValue( String key, String value )
-    {
-        return String.format( "Mapped %s to %s", key, value );
-    }
 
-    public static String allMappingsDeleted() {
-        return "All mappings have been deleted";
-    }
 }

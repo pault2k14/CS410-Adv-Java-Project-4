@@ -2,11 +2,8 @@ package edu.pdx.cs410J.pbt;
 
 import edu.pdx.cs410J.AbstractAppointmentBook;
 import edu.pdx.cs410J.web.HttpRequestHelper;
-import edu.pdx.cs410J.pbt.AppointmentBookRestClient;
-
 import java.io.IOException;
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,7 +13,8 @@ import java.util.Date;
 
 /**
  * The main class that parses the command line and communicates with the
- * Appointment Book server using REST.
+ * Appointment Book server using REST. Allows for adding new appointments, and
+ * searching for appointments within a date range.
  */
 public class Project4 {
 
@@ -89,7 +87,6 @@ public class Project4 {
                 System.exit(1);
             }
 
-
             if(args[i].equals("-host")) {
                 expectedArgs += 2;
                 firstAppointmentArg += 2;
@@ -106,7 +103,6 @@ public class Project4 {
                     System.exit(0);
                 }
             }
-
 
             if(args[i].equals("-port")) {
                 expectedArgs += 2;
@@ -250,7 +246,7 @@ public class Project4 {
             beginDate = dateFormat.parse(stringBeginDate);
         }
         catch (ParseException e) {
-            System.err.println("In project2 Begin date and time format is incorrect.");
+            System.err.println("Begin date and time format is incorrect.");
             System.exit(0);
         }
 
@@ -264,28 +260,17 @@ public class Project4 {
             System.exit(0);
         }
 
-
-
         AppointmentBookRestClient client = new AppointmentBookRestClient(hostName, port);
 
         HttpRequestHelper.Response response = null;
         try {
 
-            response = client.addAppointment(newOwner, newDescription, stringBeginDate, stringEndDate);
-            /*
-            if (key == null) {
-                // Print all key/value pairs
-                response = client.getAllKeysAndValues();
-
-            } else if (value == null) {
-                // Print all values of key
-                response = client.getValues(key);
-
-            } else {
-                // Post the key/value pair
-                response = client.addKeyValuePair(key, value);
+            if(searchPresent) {
+                response = client.searchAppointments(newOwner, stringBeginDate, stringEndDate);
             }
-            */
+            else {
+                response = client.addAppointment(newOwner, newDescription, stringBeginDate, stringEndDate);
+            }
 
             checkResponseCode( HttpURLConnection.HTTP_OK, response);
 
@@ -331,26 +316,5 @@ public class Project4 {
         System.exit(1);
     }
 
-    /**
-     * Prints usage information for this program and exits
-     * @param message An error message to print
-     */
-    private static void usage( String message )
-    {
-        PrintStream err = System.err;
-        err.println("** " + message);
-        err.println();
-        err.println("usage: java Project4 host port [key] [value]");
-        err.println("  host    Host of web server");
-        err.println("  port    Port of web server");
-        err.println("  key     Key to query");
-        err.println("  value   Value to add to server");
-        err.println();
-        err.println("This simple program posts key/value pairs to the server");
-        err.println("If no value is specified, then all values are printed");
-        err.println("If no key is specified, all key/value pairs are printed");
-        err.println();
 
-        System.exit(1);
-    }
 }

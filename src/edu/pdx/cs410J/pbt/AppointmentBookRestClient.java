@@ -1,16 +1,15 @@
 package edu.pdx.cs410J.pbt;
 
-// import com.google.common.annotations.VisibleForTesting;
 import edu.pdx.cs410J.web.HttpRequestHelper;
-
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.net.URLConnection;
+
 
 /**
  * A helper class for accessing the rest client
+ * Has the ability to search for appointments in a date range of
+ * a specific owner, and  the ability to add a new appointment for
+ * a specified owner.
  */
 public class AppointmentBookRestClient extends HttpRequestHelper
 {
@@ -31,26 +30,18 @@ public class AppointmentBookRestClient extends HttpRequestHelper
     }
 
     /**
-     * Returns all keys and values from the server
+     * Adds a new appointment to the appointment book specified by the newOwner parameter.
+     * @param newOwner - Owner of the appointment book to add the appointment to.
+     * @param newDescription - Description of the new appointment.
+     * @param newBeginTime - Beginning time of the new appointment.
+     * @param newEndTime - Ending time of the new appointment.
+     * @return - A server response object from the HTTP server that was contacted.
+     * @throws IOException - Throws an exception when there was a problem contacting
+     *                       the specified HTTP server.
      */
-    public Response getAllKeysAndValues() throws IOException
-    {
-        return get(this.url );
-    }
-
-    /**
-     * Returns all values for the given key
-     */
-    public Response getValues( String key ) throws IOException
-    {
-        return get(this.url, "key", key);
-    }
-
     public Response addAppointment( String newOwner, String newDescription, String newBeginTime, String newEndTime) throws IOException
     {
-
-
-
+        // Build the parameter array.
         String[] params = new String[8];
         params[0] = "owner";
         params[1] = newOwner;
@@ -61,25 +52,57 @@ public class AppointmentBookRestClient extends HttpRequestHelper
         params[6] = "endTime";
         params[7] = newEndTime;
 
+        // Encode the parameters of our POST URL.
         this.url += "?owner=" + URLEncoder.encode(newOwner, "UTF-8");
+
         return postToMyURL("key", "owner", "value", newOwner,
                 "key", "description", "value", newDescription,
                 "key", "beginTime", "value", newBeginTime,
                 "key", "endTime", "value", newEndTime);
     }
 
-    public Response addKeyValuePair( String key, String value ) throws IOException
+    /**
+     * Searchs for appointments belonging to the specified owner, between
+     * the specified beginning and end dates.
+     * @param newOwner - Owner of the appointment book to search.
+     * @param newBeginTime - beginning time and date of the appointments to search.
+     * @param newEndTime - ending time and date of the appointments to search.
+     * @return - A response object from the HTTP server that was contacted.
+     * @throws IOException - Throws an exception when there is a problem contacting
+     *                       the HTTP server.
+     */
+    public Response searchAppointments( String newOwner, String newBeginTime, String newEndTime) throws IOException
     {
-        return postToMyURL("key", key, "value", value);
+
+        // Build our array of parameters.
+        String[] params = new String[6];
+        params[0] = "owner";
+        params[1] = newOwner;
+        params[2] = "beginTime";
+        params[3] = newBeginTime;
+        params[4] = "endTime";
+        params[5] = newEndTime;
+
+
+        // Encode our URL as UTF-8.
+        this.url += "?owner=" + URLEncoder.encode(newOwner, "UTF-8")
+                 + "&beginTime=" + URLEncoder.encode(newBeginTime, "UTF-8")
+                 + "&endTime=" + URLEncoder.encode(newEndTime, "UTF-8");
+
+        return get(this.url);
     }
 
-    // @VisibleForTesting
-    Response postToMyURL(String... keysAndValues) throws IOException {
+    /**
+     * A convience method that sends a POST request along with it's
+     * paramemters to a HTTP server.
+     * @param keysAndValues - list of key value pairs that make up
+     *                      a post requests payload paramemters.
+     * @return - Returns a response object from the HTTP server.
+     * @throws IOException - Throws an IOException if there is a problem
+     *                       contact the server.
+     */
+    private Response postToMyURL(String... keysAndValues) throws IOException {
         return post(this.url, keysAndValues);
     }
 
-    public Response removeAllMappings() throws IOException {
-        return post(this.url);
-        // return delete(this.url);
-    }
 }

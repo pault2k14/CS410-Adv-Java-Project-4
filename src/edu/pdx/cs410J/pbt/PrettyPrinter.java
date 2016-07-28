@@ -47,7 +47,6 @@ public class PrettyPrinter implements AppointmentBookDumper {
             System.setOut(fileOut);
         }
 
-        System.out.println( appointmentBook.getOwnerName() + "'s" + " appointment book!");
         System.out.println();
 
         // print each appointment.
