@@ -1,6 +1,6 @@
 
-Description: a cool appointment
-Duration: 5745 minutes.
-Begin Time: 3/1/16 4:15 PM
-End Time: 3/5/16 4:00 PM
+Description: a cool appt!
+Duration: 13365 minutes.
+Begin Time: 3/1/16 1:15 PM
+End Time: 3/10/16 8:00 PM
 
