@@ -55,10 +55,10 @@ public class AppointmentBookRestClient extends HttpRequestHelper
         // Encode the parameters of our POST URL.
         this.url += "?owner=" + URLEncoder.encode(newOwner, "UTF-8");
 
-        return postToMyURL("key", "owner", "value", newOwner,
-                "key", "description", "value", newDescription,
-                "key", "beginTime", "value", newBeginTime,
-                "key", "endTime", "value", newEndTime);
+        return postToMyURL("owner", newOwner,
+                "description", newDescription,
+                "beginTime", newBeginTime,
+                "endTime", newEndTime);
     }
 
     /**

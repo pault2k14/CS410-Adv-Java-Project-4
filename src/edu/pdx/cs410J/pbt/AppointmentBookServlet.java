@@ -275,34 +275,10 @@ public class AppointmentBookServlet extends HttpServlet
             String beginTime = null;
             String endTime = null;
 
-            // Get all of our keys.
-            if(keyParamValues == null) {
-                missingRequiredParameter(response, "No key parameters found!");
-                return;
-            }
-
-            // Get all of our key values.
-            if(valueParamValues == null) {
-                missingRequiredParameter(response, "No values for key parameters found!");
-                return;
-            }
-
-            // Pair all of the keys and key values.
-            if (keyParamValues.length == valueParamValues.length) {
-
-                for (int i = 0; i < keyParamValues.length; ++i) {
-                    paramMap.put(keyParamValues[i], valueParamValues[i]);
-                }
-            } else {
-                missingRequiredParameter(response, "Query parameter mismatch!");
-                return;
-            }
-
-            // Setup our appointment parameters.
-            owner = paramMap.get("owner");
-            description = paramMap.get("description");
-            beginTime = paramMap.get("beginTime");
-            endTime = paramMap.get("endTime");
+            owner = request.getParameter("owner");
+            description = request.getParameter("description");
+            beginTime = request.getParameter("beginTime");
+            endTime = request.getParameter("endTime");
 
             // Make sure owner isn't null, and that it isn't blank.
             if (owner == null || owner.length() == 0) {
