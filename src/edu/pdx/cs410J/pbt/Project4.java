@@ -18,37 +18,88 @@ import java.util.Date;
  */
 public class Project4 {
 
+    static private String hostName = null;
+    static private int port = 0;
+    static private boolean searchPresent = false;
+    static private boolean portPresent = false;
+    static private boolean hostPresent = false;
+    static private boolean printAppointment = false;
+    static private String newOwner = null;
+    static private String newDescription = null;
+    static private String stringBeginDate = null;
+    static private String stringEndDate = null;
+
     public static void main(String... args) {
 
-        Class c = AbstractAppointmentBook.class;  // Refer to one of Dave's classes so that we can be sure it is on the classpath
+        parseCommandLine(args);
 
         AppointmentBook appointmentBook = null;
         Appointment appointment = null;
-        boolean searchPresent = false;
-        String hostName = null;
-        int port = 0;
-        boolean portPresent = false;
-        boolean hostPresent = false;
-        String key = null;
-        String value = null;
-        Date beginDate = null;
-        Date endDate = null;
+
+        Class c = AbstractAppointmentBook.class;  // Refer to one of Dave's classes so that we can be sure it is on the classpath
+
+        if(!hostPresent && !portPresent && !searchPresent) {
+            appointmentBook = new AppointmentBook(newOwner);
+            appointment = new Appointment(newDescription, stringBeginDate, stringEndDate);
+            appointmentBook.addAppointment(appointment);
+        }
+
+        if(hostPresent && portPresent) {
+
+            AppointmentBookRestClient client = new AppointmentBookRestClient(hostName, port);
+            HttpRequestHelper.Response response = null;
+
+            try {
+
+                if (searchPresent) {
+                    response = client.searchAppointments(newOwner, stringBeginDate, stringEndDate);
+                } else {
+                    response = client.addAppointment(newOwner, newDescription, stringBeginDate, stringEndDate);
+                }
+
+                checkResponseCode(HttpURLConnection.HTTP_OK, response);
+
+            } catch (IOException ex) {
+                System.err.println("Unable to contact server at " + hostName + ":" + port);
+                return;
+            }
+
+            if((searchPresent || printAppointment) && response.getCode() == 200 ) {
+                System.out.println(response.getContent());
+            }
+        }
+        else if(printAppointment && !hostPresent && !portPresent && !searchPresent && appointmentBook != null && appointment != null) {
+            System.out.println("Appointment for: " + appointmentBook.getOwnerName() + "\n" +
+                    "Description: " + appointment.getDescription() + "\n" +
+                    "Begin time: " + appointment.getBeginTimeString() + "\n" +
+                    "End time: " + appointment.getEndTimeString() + "\n"
+            );
+        }
+
+
+        System.exit(0);
+    }
+
+    /**
+     * Parses command line arguments and assigns parsed values
+     * to the appropriate class members.
+     * @param args - The list of command line arguments.
+     */
+    private static void parseCommandLine(String... args) {
+
         int expectedArgs = 8;
         int firstAppointmentArg = 0;
-        boolean printAppointment = false;
-        String newOwner = null;
-        String newDescription = null;
-        String stringBeginDate = null;
-        String stringEndDate = null;
+        Date beginDate = null;
+        Date endDate = null;
+        String startAmPmModifier = null;
+        String endAmPmModifier = null;
         String stringOnlyBeginDate = null;
         String stringOnlyEndDate = null;
         String stringStartTime = null;
         String stringEndTime = null;
-        String startAmPmModifier = null;
-        String endAmPmModifier = null;
+        ArrayList<String> expectedOptions = new ArrayList<>();
 
         // Hold the command line options that we expect to exist.
-        ArrayList<String> expectedOptions = new ArrayList<>();
         expectedOptions.add("-README");
         expectedOptions.add("-print");
         expectedOptions.add("-host");
@@ -143,6 +194,11 @@ public class Project4 {
 
                 if(!Arrays.asList(args).contains("-port")) {
                     System.err.println("search specified but port was not specified.");
+                    System.exit(0);
+                }
+
+                if(Arrays.asList(args).contains("-print")) {
+                    System.err.println("search specified but print was also specified!");
                     System.exit(0);
                 }
             }
@@ -242,13 +298,10 @@ public class Project4 {
             System.exit(0);
         }
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy hh:mm a");
-        dateFormat.setLenient(false);
-
         // Attempt to parse the begin date and time to ensure that they
         // are valid dates and times.
         try {
-            beginDate = dateFormat.parse(stringBeginDate);
+            beginDate = Appointment.parseAppointmentDateTime(stringBeginDate);
         }
         catch (ParseException e) {
             System.err.println("Begin date and time format is incorrect.");
@@ -258,52 +311,12 @@ public class Project4 {
         // Attempt to parse the begin date and time to ensure that they
         // are valid dates and times.
         try {
-            endDate = dateFormat.parse(stringEndDate);
+            endDate = Appointment.parseAppointmentDateTime(stringEndDate);
         }
         catch (ParseException e) {
             System.err.println("End date and time format is incorrect.");
             System.exit(0);
         }
-
-        if(!hostPresent && !portPresent && !searchPresent) {
-            appointmentBook = new AppointmentBook(newOwner);
-            appointment = new Appointment(newDescription, stringBeginDate, stringEndDate);
-            appointmentBook.addAppointment(appointment);
-        }
-
-        AppointmentBookRestClient client = new AppointmentBookRestClient(hostName, port);
-
-        HttpRequestHelper.Response response = null;
-
-        if(hostPresent && portPresent) {
-            try {
-
-                if (searchPresent) {
-                    response = client.searchAppointments(newOwner, stringBeginDate, stringEndDate);
-                } else {
-                    response = client.addAppointment(newOwner, newDescription, stringBeginDate, stringEndDate);
-                }
-
-                checkResponseCode(HttpURLConnection.HTTP_OK, response);
-
-            } catch (IOException ex) {
-                error("While contacting server: " + ex);
-                return;
-            }
-        }
-        if(hostPresent && portPresent && response.getCode() == 200 ) {
-            System.out.println(response.getContent());
-        }
-        else if(printAppointment && !hostPresent && !portPresent && !searchPresent && appointmentBook != null && appointment != null) {
-            System.out.println("Appointment for: " + appointmentBook.getOwnerName() + "\n" +
-                    "Description: " + appointment.getDescription() + "\n" +
-                    "Begin time: " + appointment.getBeginTimeString() + "\n" +
-                    "End time: " + appointment.getEndTimeString() + "\n"
-            );
-        }
-
-
-        System.exit(0);
     }
 
     /**
@@ -319,6 +332,10 @@ public class Project4 {
         }
     }
 
+    /**
+     * Used  to format messages in System.err.
+     * @param message - The message to send to System.err
+     */
     private static void error( String message )
     {
         PrintStream err = System.err;

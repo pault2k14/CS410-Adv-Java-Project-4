@@ -28,14 +28,10 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
      */
     public Appointment(String newDescription, String newBeginTime, String newEndTime) {
 
-
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("M/d/yy h:mm a");
-        shortDateFormat.setLenient(false);
-
         // Attempt to parse the begin date and time to ensure that they
         // are valid dates and times.
         try {
-            this.beginTime = shortDateFormat.parse(newBeginTime);
+            this.beginTime = parseAppointmentDateTime(newBeginTime);
         }
         catch (ParseException e) {
             System.err.println("Begin date and time format is incorrect.");
@@ -45,7 +41,7 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
         // Attempt to parse the end date and time to ensure that they
         // are valid dates and times.
         try {
-            this.endTime = shortDateFormat.parse(newEndTime);
+            this.endTime = parseAppointmentDateTime(newEndTime);
         }
         catch (ParseException e) {
             System.err.println("End date and time format is incorrect.");
@@ -54,6 +50,35 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
 
         this.description = newDescription;
 
+    }
+
+    /**
+     * Parses a string based on how an appointment date and time should
+     * be formatted.
+     * @param appointmentDateTime - String containing the appointment date and time.
+     * @return - Returns the parsed Date object.
+     * @throws ParseException - Thrown when it is not possible to parse the
+     *                          passed in appointmentDateTime string.
+     */
+    static public Date parseAppointmentDateTime(String appointmentDateTime) throws ParseException {
+
+        if(appointmentDateTime == null) {
+            throw new ParseException("Unable to parse a null date!", 0);
+        }
+
+        Date parsedDate = null;
+        SimpleDateFormat shortDateFormat = new SimpleDateFormat("M/d/yy h:mm a");
+        shortDateFormat.setLenient(false);
+
+        // Attempt to parse the begin date and time to ensure that they
+        // are valid dates and times.
+        parsedDate = shortDateFormat.parse(appointmentDateTime);
+
+        if(parsedDate == null) {
+            throw new ParseException("Unable to parse date!", 0);
+        }
+
+        return parsedDate;
     }
 
     /**

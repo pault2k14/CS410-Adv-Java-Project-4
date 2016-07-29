@@ -1,6 +1,1 @@
 
-Description: a cool appt!
-Duration: 13365 minutes.
-Begin Time: 3/1/16 1:15 PM
-End Time: 3/10/16 8:00 PM
-

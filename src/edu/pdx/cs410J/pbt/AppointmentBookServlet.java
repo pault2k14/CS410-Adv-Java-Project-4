@@ -90,6 +90,13 @@ public class AppointmentBookServlet extends HttpServlet
 
     }
 
+    /**
+     * Allows viewing of all appointments for a specified owner.
+     * @param request - The request made by the client.
+     * @param response - The response to be sent back to the client.
+     * @throws ServletException - Thrown when the server encounters an error.
+     * @throws IOException - Thrown when the server encounters an IO error.
+     */
     protected void viewAllAppointments(HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
 
@@ -144,6 +151,14 @@ public class AppointmentBookServlet extends HttpServlet
     }
 
 
+    /**
+     * searches for all appointments beloning to a specific owner
+     * between a beginning date and time and an ending date and time.
+     * @param request - The request made by the client.
+     * @param response - The response to be sent back to the client.
+     * @throws ServletException - Thrown when the server encounters an error.
+     * @throws IOException - Thrown when the server encounters an IO error.
+     */
     protected void searchAllAppointments(HttpServletRequest request, HttpServletResponse response ) throws ServletException, IOException
     {
         response.setContentType( "text/plain" );
