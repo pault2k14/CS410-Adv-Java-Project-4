@@ -76,7 +76,6 @@ public class Project4 {
             );
         }
 
-
         System.exit(0);
     }
 
@@ -89,14 +88,6 @@ public class Project4 {
 
         int expectedArgs = 8;
         int firstAppointmentArg = 0;
-        Date beginDate = null;
-        Date endDate = null;
-        String startAmPmModifier = null;
-        String endAmPmModifier = null;
-        String stringOnlyBeginDate = null;
-        String stringOnlyEndDate = null;
-        String stringStartTime = null;
-        String stringEndTime = null;
         ArrayList<String> expectedOptions = new ArrayList<>();
 
         // Hold the command line options that we expect to exist.
@@ -231,23 +222,11 @@ public class Project4 {
             newDescription = args[firstAppointmentArg + 1];
             stringBeginDate = args[firstAppointmentArg + 2] + " " + args[firstAppointmentArg + 3] + " " + args[firstAppointmentArg + 4];
             stringEndDate = args[firstAppointmentArg + 5] + " " + args[firstAppointmentArg + 6] + " " + args[firstAppointmentArg + 7];
-            stringOnlyBeginDate = args[firstAppointmentArg + 2];
-            stringOnlyEndDate = args[firstAppointmentArg + 5];
-            stringStartTime = args[firstAppointmentArg + 3];
-            stringEndTime = args[firstAppointmentArg + 6];
-            startAmPmModifier = args[firstAppointmentArg + 4];
-            endAmPmModifier = args[firstAppointmentArg + 7];
         }
         else {
             newOwner = args[firstAppointmentArg + 0];
             stringBeginDate = args[firstAppointmentArg + 1] + " " + args[firstAppointmentArg + 2] + " " + args[firstAppointmentArg + 3];
             stringEndDate = args[firstAppointmentArg + 4] + " " + args[firstAppointmentArg + 5] + " " + args[firstAppointmentArg + 6];
-            stringOnlyBeginDate = args[firstAppointmentArg + 1];
-            stringOnlyEndDate = args[firstAppointmentArg + 4];
-            stringStartTime = args[firstAppointmentArg + 2];
-            stringEndTime = args[firstAppointmentArg + 5];
-            startAmPmModifier = args[firstAppointmentArg + 3];
-            endAmPmModifier = args[firstAppointmentArg + 6];
         }
 
         // Check to make sure the owner field is not blank.
@@ -262,38 +241,20 @@ public class Project4 {
             System.exit(0);
         }
 
-        // Check to make sure the begin date format is correct.
-        if(!stringOnlyBeginDate.matches("\\d\\d?/\\d\\d?/\\d\\d\\d\\d")) {
-            System.err.println("Begin date is incorrectly formatted!");
-            System.exit(0);
+        try {
+            Appointment.parseAppointmentDateTime(stringBeginDate);
         }
 
-        // Check to make sure the begin time format is correct.
-        if(!stringStartTime.matches("\\d\\d?:\\d\\d")) {
+        catch(ParseException e) {
             System.err.println("Begin time is incorrectly formatted!");
             System.exit(0);
         }
 
-        // Check to make sure the begin time am/pm is correct.
-        if(!startAmPmModifier.matches("(am|pm)")) {
-            System.err.println("Begin time is incorrectly formatted!");
-            System.exit(0);
+        try {
+            Appointment.parseAppointmentDateTime(stringEndDate);
         }
 
-        // Check to make sure the end date format is correct.
-        if(!stringOnlyEndDate.matches("\\d\\d?/\\d\\d?/\\d\\d\\d\\d")) {
-            System.err.println("End date is incorrectly formatted!");
-            System.exit(0);
-        }
-
-        // Check to make sure the end time format is correct.
-        if(!stringEndTime.matches("\\d\\d?:\\d\\d")) {
-            System.err.println("End time is incorrectly formatted!");
-            System.exit(0);
-        }
-
-        // Check to make sure the end time am/pm is correct.
-        if(!endAmPmModifier.matches("(am|pm)")) {
+        catch(ParseException e) {
             System.err.println("End time is incorrectly formatted!");
             System.exit(0);
         }
@@ -301,9 +262,9 @@ public class Project4 {
         // Attempt to parse the begin date and time to ensure that they
         // are valid dates and times.
         try {
-            beginDate = Appointment.parseAppointmentDateTime(stringBeginDate);
+            Appointment.parseAppointmentDateTime(stringBeginDate);
         }
-        catch (ParseException e) {
+        catch (ParseException ex) {
             System.err.println("Begin date and time format is incorrect.");
             System.exit(0);
         }
@@ -311,7 +272,7 @@ public class Project4 {
         // Attempt to parse the begin date and time to ensure that they
         // are valid dates and times.
         try {
-            endDate = Appointment.parseAppointmentDateTime(stringEndDate);
+            Appointment.parseAppointmentDateTime(stringEndDate);
         }
         catch (ParseException e) {
             System.err.println("End date and time format is incorrect.");

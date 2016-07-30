@@ -62,13 +62,18 @@ public class Appointment extends AbstractAppointment implements Comparable<Appoi
      */
     static public Date parseAppointmentDateTime(String appointmentDateTime) throws ParseException {
 
+        String timeDateFilter = "\\d\\d?/\\d\\d?/\\d\\d\\d\\d \\d\\d?:\\d\\d (am|pm)";
+        Date parsedDate = null;
+        SimpleDateFormat shortDateFormat = new SimpleDateFormat("M/d/yy h:mm a");
+        shortDateFormat.setLenient(false);
+
         if(appointmentDateTime == null) {
             throw new ParseException("Unable to parse a null date!", 0);
         }
 
-        Date parsedDate = null;
-        SimpleDateFormat shortDateFormat = new SimpleDateFormat("M/d/yy h:mm a");
-        shortDateFormat.setLenient(false);
+        if(!appointmentDateTime.matches(timeDateFilter)) {
+            throw new ParseException("Date and time in incorrect format.", 0);
+        }
 
         // Attempt to parse the begin date and time to ensure that they
         // are valid dates and times.
